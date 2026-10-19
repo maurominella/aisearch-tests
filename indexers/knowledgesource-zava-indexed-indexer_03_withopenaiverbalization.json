@@ -1,0 +1,35 @@
+{
+  "@odata.context": "https://aifoundry-6956-search.search.windows.net/$metadata#indexers/$entity",
+  "@odata.etag": "\"0x8DF2DCD897A10C1\"",
+  "name": "knowledgesource-zava-indexed-indexer-03",
+  "description": "Indexer for knowledge source 'knowledgesource-zava-indexed'",
+  "dataSourceName": "knowledgesource-zava-indexed-datasource",
+  "skillsetName": "knowledgesource-zava-indexed-skillset-03",
+  "targetIndexName": "knowledgesource-zava-indexed-index-03",
+  "disabled": false,
+  "schedule": {
+    "interval": "P1D",
+    "startTime": "2026-10-18T12:39:16.029Z"
+  },
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": -1,
+    "maxFailedItemsPerBatch": -1,
+    "configuration": {
+      "dataToExtract": "allMetadata",
+      "parsingMode": "default",
+      "allowSkillsetToReadFileData": true,
+      "imageAction": "none"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_spo_item_path",
+      "targetFieldName": "doc_url",
+      "mappingFunction": null
+    }
+  ],
+  "outputFieldMappings": [],
+  "cache": null,
+  "encryptionKey": null
+}

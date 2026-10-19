@@ -1,0 +1,119 @@
+{
+  "@odata.etag": "\"0x8DF2DCC88332D11\"",
+  "name": "knowledgesource-zava-indexed-skillset-02",
+  "description": "Skillset for knowledge source 'knowledgesource-zava-indexed'",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Util.DocumentExtractionSkill",
+      "name": "#1",
+      "context": "/document",
+      "parsingMode": "default",
+      "dataToExtract": "contentAndMetadata",
+      "inputs": [
+        {
+          "name": "file_data",
+          "source": "/document/file_data",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "content",
+          "targetName": "extracted_content"
+        },
+        {
+          "name": "normalized_images",
+          "targetName": "normalized_images"
+        }
+      ],
+      "configuration": {
+        "imageAction": "generateNormalizedImages",
+        "normalizedImageMaxWidth@odata.type": "#Int64",
+        "normalizedImageMaxWidth": 2000,
+        "normalizedImageMaxHeight@odata.type": "#Int64",
+        "normalizedImageMaxHeight": 2000
+      }
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+      "name": "SplitSkill",
+      "description": "Split document content into chunks",
+      "context": "/document",
+      "defaultLanguageCode": "en",
+      "textSplitMode": "pages",
+      "maximumPageLength": 2000,
+      "pageOverlapLength": 200,
+      "maximumPagesToTake": 0,
+      "unit": "characters",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/extracted_content",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "textItems",
+          "targetName": "pages"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+      "name": "AzureOpenAIEmbeddingSkill",
+      "description": "Generate embeddings",
+      "context": "/document/pages/*",
+      "resourceUri": "https://foundry6956.openai.azure.com",
+      "deploymentId": "text-embedding-3-small",
+      "dimensions": 1536,
+      "modelName": "text-embedding-3-small",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/pages/*",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "embedding",
+          "targetName": "text_vector"
+        }
+      ]
+    }
+  ],
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.AIServicesByIdentity",
+    "subdomainUrl": "https://foundry6956.services.ai.azure.com/"
+  },
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "knowledgesource-zava-indexed-index",
+        "parentKeyFieldName": "snippet_parent_id",
+        "sourceContext": "/document/pages/*",
+        "mappings": [
+          {
+            "name": "snippet_vector",
+            "source": "/document/pages/*/text_vector",
+            "inputs": []
+          },
+          {
+            "name": "snippet",
+            "source": "/document/pages/*",
+            "inputs": []
+          },
+          {
+            "name": "doc_url",
+            "source": "/document/doc_url",
+            "inputs": []
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    }
+  }
+}
